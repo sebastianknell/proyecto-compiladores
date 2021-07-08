@@ -28,7 +28,15 @@ digit           [0-9]
             }
         }
 
-\n          mylineno++;
+\n          {mylineno++; cout << endl;}
+
+entero
+retorno
+sin_tipo
+mientras
+si
+sino
+main
 
 {id}        cout << "<ID, " << YYText() << ">";
 
