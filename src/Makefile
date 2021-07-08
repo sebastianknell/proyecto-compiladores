@@ -1,3 +1,4 @@
+all: run
 
 run:
 	flex ces.l
