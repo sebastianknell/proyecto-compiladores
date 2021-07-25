@@ -30,13 +30,13 @@ digit           [0-9]
 
 \n          {mylineno++; cout << endl;}
 
-"entero"
-"retorno"
-"sin_tipo"
-"mientras"
-"si"
-"sino"
-"main"
+"entero"    cout<< "<entero>";
+"retorno"   cout<< "<retorno>";
+"sin_tipo"  cout<<"<sin_tipo>";
+"mientras"  cout<<"<mientras>";
+"si"        cout<<"<si>";
+"sino"      cout<<"<sino>";
+"main"      cout<<"<main>";
 
 {id}        cout << "<ID, " << YYText() << ">";
 
