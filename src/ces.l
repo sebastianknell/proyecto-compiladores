@@ -7,7 +7,7 @@ int mylineno = 0;
 %option noyywrap c++
 
 whitespace      [ \t]+
-id              [A-Za-z]
+id              [A-Za-z]+
 digit           [0-9]
 
 %%
@@ -30,13 +30,13 @@ digit           [0-9]
 
 \n          {mylineno++; cout << endl;}
 
-entero
-retorno
-sin_tipo
-mientras
-si
-sino
-main
+"entero"
+"retorno"
+"sin_tipo"
+"mientras"
+"si"
+"sino"
+"main"
 
 {id}        cout << "<ID, " << YYText() << ">";
 

@@ -1,7 +1,7 @@
 all: run
 
 run:
-	make clean
+	# make clean
 	flex ces.l
 	g++ lex.yy.cc -o main main.cpp
 	./main < sample.ces
