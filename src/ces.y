@@ -28,8 +28,7 @@ bool find_func(string id);
 %}
 
 %union{
-  string* id_val;
-  string*	op_val;
+  string str_val;
   int int_val;
 }
 
@@ -41,11 +40,10 @@ bool find_func(string id);
 %token mientras
 %token si
 %token sino
-%token <id_val> ID
-%token NUM
+%token <str_val> ID
+%token <int_val> NUM
 %token EOS
 %token main
-%token vacio // TODO remove
 
 %%
 
@@ -54,13 +52,13 @@ lista_declaracion: lista_declaracion declaracion | declaracion ;
 declaracion: var_declaracion | fun_declaracion ;
 
 var_declaracion:
-  | entero ID EOS {
-    if (find_var(*$2)) yyerror("Variable already declared");
-    else if (find_func(*$2)) yyerror("A function exists with this name")
+  entero ID EOS {
+    if (find_var($2)) yyerror("Variable already declared");
+    else if (find_func($2)) yyerror("A function exists with this name")
     else {
       var_atr atr;
       atr.decl_line = yylineno;
-      variables[*$2] = atr;
+      variables[$2] = atr;
     }
   }
   | entero ID '['NUM']' EOS
@@ -68,14 +66,18 @@ var_declaracion:
 
 tipo: entero | sin_tipo ;
 
-fun_declaracion: tipo ID '('params')' sent_compuesta ;
+fun_declaracion: 
+  tipo ID '('params')' sent_compuesta {
+    if (find_func($1)) yyerror("Function already declared")
+  }
+  ;
 params: lista_params | sin_tipo ;
 lista_params: lista_params ',' param | param ;
 param: tipo ID | tipo ID "[]" ;
 
 sent_compuesta: '{'declaracion_local lista_sentencias'}' ;
-declaracion_local: declaracion_local var_declaracion | vacio ;
-lista_sentencias: lista_sentencias sentencia | vacio ;
+declaracion_local: declaracion_local var_declaracion | /* empty */ ;
+lista_sentencias: lista_sentencias sentencia | /* empty */ ;
 sentencia: sentencia_expresion 
   | sentencia_seleccion 
   | sentencia_iteracion 
@@ -91,8 +93,12 @@ expresion:
   | expresion_simple 
   ;
 var: 
-  ID 
-  | ID '['expresion']' 
+  ID {
+    if (!find_var($1)) yyerror("Undeclared variable")
+  }
+  | ID '['expresion']' {
+    if (!find_var($1)) yyerror("Undeclared variable")
+  }
   ;
 
 expresion_simple: expresion_aditiva relop expresion_aditiva | expresion_aditiva ;
@@ -103,8 +109,11 @@ addop: "+" | "−" ;
 term: term mulop factor | factor ;
 mulop: "*" | "/" ;
 factor: '('expresion')' | var | call | NUM ;
-call: ID '('args')' ;
-args: lista_arg | vacio ;
+call: ID '('args')' {
+  if (!find_func($1)) yyerror("Undeclared function")
+}
+;
+args: lista_arg | /* empty */ ;
 lista_arg: lista_arg ',' expresion | expresion ;
 
 %%

@@ -7,7 +7,7 @@ int yyerror(char *s);
 
 whitespace      [ \t]+
 id              [A-Za-z]+
-digit           [0-9]+
+num           [0-9]+
 
 %x IN_COMMENT
 
@@ -28,8 +28,8 @@ digit           [0-9]+
 "sino"      { return sino; }
 "main"      { return main; }
 
-{id}        { yylval.id_val = new string(yytext); return ID; }
-{digit}     { return NUM; }
+{id}        { yylval.id_val = string(yytext); return ID; }
+{num}       { yylval.id_val = stoi(yytext); return NUM; }
 
 ";"         { return EOS; }
 
