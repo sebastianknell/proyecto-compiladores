@@ -1,14 +1,13 @@
 %{
-#include <iostream>
-using namespace std;
-int mylineno = 0;
+#include "heading.h"
+#include "tok.h"
+extern "C" int yylex();
+int yyerror(char *s);
 %}
-
-%option noyywrap c++
 
 whitespace      [ \t]+
 id              [A-Za-z]+
-digit           [0-9]
+digit           [0-9]+
 
 %%
 
@@ -18,29 +17,31 @@ digit           [0-9]
             int c; 
             while ((c = yyinput()) != 0) {
                 if(c == '\n')
-                    ++mylineno;
+                    ++yylineno;
                 else if (c == '*') {
                     if ((c = yyinput()) == '/')
                         break;
-                    else
-                        unput(c);
+                    // else
+                    //     unput(c);
                 }
             }
         }
 
-\n          {mylineno++; cout << endl;}
+\n          {yylineno++;}
 
-"entero"
-"retorno"
-"sin_tipo"
-"mientras"
-"si"
-"sino"
-"main"
+"entero"    { return entero; }
+"retorno"   { return retorno; }
+"sin_tipo"  { return sin_tipo; }
+"mientras"  { return mientras; }
+"si"        { return si; }
+"sino"      { return sino; }
+"main"      { return main; }
 
-{id}        cout << "<ID, " << YYText() << ">";
+{id}        { return ID; }
+{digit}     { return NUM; }
 
-{digit}     cout << "<DIGIT, " << YYText() << ">";
+";"         { return EOS; }
 
+.		    { std::cerr << "SCANNER "; yyerror(""); exit(1); }
 
 %%
