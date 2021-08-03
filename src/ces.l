@@ -28,11 +28,11 @@ digit           [0-9]+
 "sino"      { return sino; }
 "main"      { return main; }
 
-{id}        { return ID; }
+{id}        { yylval.id_val = new string(yytext); return ID; }
 {digit}     { return NUM; }
 
 ";"         { return EOS; }
 
-.		    { std::cerr << "SCANNER "; yyerror(""); exit(1); }
+.		    { std::cerr << "SCANNER "; yyerror("Invalid character"); exit(1); }
 
 %%

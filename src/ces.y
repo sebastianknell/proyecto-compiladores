@@ -2,7 +2,36 @@
 #include "heading.h"
 int yyerror(char *s);
 extern "C" int yylex();
+
+enum type_t{
+  sin_tipo
+  entero,
+};
+
+struct var_atr {
+  int value;
+  int decl_line;
+};
+
+struct func_atr {
+  type_t rtype;
+  int n_params;
+  int decl_line;
+};
+
+map<string, var_atr> variables;
+map<string, func_atr> functions;
+
+bool find_var(string id);
+bool find_func(string id);
+
 %}
+
+%union{
+  string* id_val;
+  string*	op_val;
+  int int_val;
+}
 
 %start programa
 
@@ -12,7 +41,7 @@ extern "C" int yylex();
 %token mientras
 %token si
 %token sino
-%token ID
+%token <id_val> ID
 %token NUM
 %token EOS
 %token main
@@ -25,7 +54,15 @@ lista_declaracion: lista_declaracion declaracion | declaracion ;
 declaracion: var_declaracion | fun_declaracion ;
 
 var_declaracion:
-  | entero ID EOS
+  | entero ID EOS {
+    if (find_var(*$2)) yyerror("Variable already declared");
+    else if (find_func(*$2)) yyerror("A function exists with this name")
+    else {
+      var_atr atr;
+      atr.decl_line = yylineno;
+      variables[*$2] = atr;
+    }
+  }
   | entero ID '['NUM']' EOS
   ;
 
@@ -49,8 +86,14 @@ sentencia_seleccion: si '('expresion')' sentencia | si '('expresion')' sentencia
 sentencia_iteracion: mientras '('expresion')' '{'lista_sentencias'}' ;
 sentencia_retorno: retorno EOS | retorno expresion EOS ;
 
-expresion: var'='expresion | expresion_simple ;
-var: ID | ID '['expresion']' ;
+expresion: 
+  var'='expresion
+  | expresion_simple 
+  ;
+var: 
+  ID 
+  | ID '['expresion']' 
+  ;
 
 expresion_simple: expresion_aditiva relop expresion_aditiva | expresion_aditiva ;
 relop: '<' | "<=" | '>' | ">=" | "==" | "!=" ;
@@ -79,4 +122,12 @@ int yyerror(string s)
 int yyerror(char *s)
 {
   return yyerror(string(s));
+}
+
+bool find_var(string id) {
+  return variables.find(id) != variables.end();
+}
+
+bool find_func(string id) {
+  return functions.find(id) != variables.end();
 }
