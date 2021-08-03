@@ -9,23 +9,14 @@ whitespace      [ \t]+
 id              [A-Za-z]+
 digit           [0-9]+
 
+%x IN_COMMENT
+
 %%
 
 {whitespace}    ;
 
-"/*"    {
-            int c; 
-            while ((c = yyinput()) != 0) {
-                if(c == '\n')
-                    ++yylineno;
-                else if (c == '*') {
-                    if ((c = yyinput()) == '/')
-                        break;
-                    // else
-                    //     unput(c);
-                }
-            }
-        }
+"/*"        { BEGIN(IN_COMMENT); }
+"*/"        { BEGIN(INITIAL); }
 
 \n          {yylineno++;}
 
