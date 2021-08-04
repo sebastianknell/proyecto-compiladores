@@ -7,7 +7,7 @@ int yyerror(char *s);
 
 whitespace      [ \t]+
 id              [A-Za-z]+
-num           [0-9]+
+num             [0-9]+
 
 %x IN_COMMENT
 
@@ -15,8 +15,15 @@ num           [0-9]+
 
 {whitespace}    ;
 
-"/*"        { BEGIN(IN_COMMENT); }
-"*/"        { BEGIN(INITIAL); }
+<INITIAL>{
+    "/*"      BEGIN(IN_COMMENT);
+}
+<IN_COMMENT>{
+    "*/"      BEGIN(INITIAL);
+    [^*\n]+   // eat comment in chunks
+    "*"       // eat the lone star
+    \n        yylineno++;
+}
 
 \n          {yylineno++;}
 
@@ -28,10 +35,19 @@ num           [0-9]+
 "sino"      { return sino; }
 "main"      { return main; }
 
-{id}        { yylval.id_val = string(yytext); return ID; }
-{num}       { yylval.id_val = stoi(yytext); return NUM; }
+{id}        { yylval.str_val = new string(yytext); return ID; }
+{num}       { yylval.int_val = stoi(yytext); return NUM; }
 
 ";"         { return EOS; }
+
+">"         { return *yytext; }
+"<"         { return *yytext; }
+">="        { return *yytext; }
+"<="        { return *yytext; }
+"=="        { return *yytext; }
+"!="        { return *yytext; }
+
+[=,()\[\]{}+-/*]    { return yytext[0]; }
 
 .		    { std::cerr << "SCANNER "; yyerror("Invalid character"); exit(1); }
 

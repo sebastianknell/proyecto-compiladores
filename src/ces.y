@@ -4,11 +4,12 @@ int yyerror(char *s);
 extern "C" int yylex();
 
 enum type_t{
-  sin_tipo
-  entero,
+  sin_tipo_t,
+  entero_t
 };
 
 struct var_atr {
+  type_t type;
   int value;
   int decl_line;
 };
@@ -28,37 +29,34 @@ bool find_func(string id);
 %}
 
 %union{
-  string str_val;
+  string* str_val;
   int int_val;
 }
 
 %start programa
 
-%token entero
-%token sin_tipo
-%token retorno
-%token mientras
-%token si
-%token sino
-%token <str_val> ID
-%token <int_val> NUM
-%token EOS
+%token entero sin_tipo
+%token retorno mientras si sino
+%token ID NUM EOS
 %token main
+
+%type<str_val> ID
+%type<int_val> NUM
 
 %%
 
 programa: lista_declaracion ;
 lista_declaracion: lista_declaracion declaracion | declaracion ;
-declaracion: var_declaracion | fun_declaracion ;
+declaracion: var_declaracion | fun_declaracion | lista_sentencias /* TODO: REMOVE. TEST ONLY */;
 
 var_declaracion:
   entero ID EOS {
-    if (find_var($2)) yyerror("Variable already declared");
-    else if (find_func($2)) yyerror("A function exists with this name")
+    if (find_var(*$2)) yyerror("Variable already declared");
+    else if (find_func(*$2)) yyerror("A function exists with this name");
     else {
       var_atr atr;
-      atr.decl_line = yylineno;
-      variables[$2] = atr;
+      atr.type = type_t::entero_t;
+      variables[*$2] = atr;
     }
   }
   | entero ID '['NUM']' EOS
@@ -67,8 +65,8 @@ var_declaracion:
 tipo: entero | sin_tipo ;
 
 fun_declaracion: 
-  tipo ID '('params')' sent_compuesta {
-    if (find_func($1)) yyerror("Function already declared")
+  tipo ID '(' params ')' sent_compuesta {
+    if (find_func(*$2)) yyerror("Function already declared");
   }
   ;
 params: lista_params | sin_tipo ;
@@ -94,10 +92,10 @@ expresion:
   ;
 var: 
   ID {
-    if (!find_var($1)) yyerror("Undeclared variable")
+    if (!find_var(*$1)) yyerror("Undeclared variable");
   }
   | ID '['expresion']' {
-    if (!find_var($1)) yyerror("Undeclared variable")
+    if (!find_var(*$1)) yyerror("Undeclared variable");
   }
   ;
 
@@ -110,7 +108,7 @@ term: term mulop factor | factor ;
 mulop: "*" | "/" ;
 factor: '('expresion')' | var | call | NUM ;
 call: ID '('args')' {
-  if (!find_func($1)) yyerror("Undeclared function")
+  if (!find_func(*$1)) yyerror("Undeclared function");
 }
 ;
 args: lista_arg | /* empty */ ;
@@ -123,7 +121,7 @@ int yyerror(string s)
   extern int yylineno;	// defined and maintained in lex.c
   extern char *yytext;	// defined and maintained in lex.c
 
-  cerr << "ERROR: " << s << " at symbol \"" << yytext;
+  cerr << "ERROR: " << s << " at symbol \"" << yytext; // TODO fix yytext to before
   cerr << "\" on line " << yylineno << endl;
   exit(1);
 }
@@ -138,5 +136,5 @@ bool find_var(string id) {
 }
 
 bool find_func(string id) {
-  return functions.find(id) != variables.end();
+  return functions.find(id) != functions.end();
 }
