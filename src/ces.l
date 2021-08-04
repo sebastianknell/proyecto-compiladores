@@ -3,10 +3,11 @@
 #include "tok.h"
 extern "C" int yylex();
 int yyerror(char *s);
+#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 %}
 
 whitespace      [ \t]+
-id              [A-Za-z]+
+id              [A-Za-z_]+
 num             [0-9]+
 
 %x IN_COMMENT
@@ -47,7 +48,7 @@ num             [0-9]+
 "=="        { return *yytext; }
 "!="        { return *yytext; }
 
-[=,()\[\]{}+-/*]    { return yytext[0]; }
+[=,()\[\]{}+-/*] { return yytext[0]; }
 
 .		    { std::cerr << "SCANNER "; yyerror("Invalid character"); exit(1); }
 

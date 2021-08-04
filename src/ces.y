@@ -1,6 +1,8 @@
 %{
+#define YYDEBUG 1
 #include "heading.h"
 int yyerror(char *s);
+int yyerror(string msg, string id, int line);
 extern "C" int yylex();
 
 enum type_t{
@@ -39,6 +41,8 @@ bool find_func(string id);
 %token retorno mientras si sino
 %token ID NUM EOS
 %token main
+%left "+" "-"
+%left "*" "/"
 
 %type<str_val> ID
 %type<int_val> NUM
@@ -51,15 +55,22 @@ declaracion: var_declaracion | fun_declaracion | lista_sentencias /* TODO: REMOV
 
 var_declaracion:
   entero ID EOS {
-    if (find_var(*$2)) yyerror("Variable already declared");
+    if (find_var(*$2)) yyerror("Variable already declared", *$2, @$.first_line);
     else if (find_func(*$2)) yyerror("A function exists with this name");
     else {
       var_atr atr;
       atr.type = type_t::entero_t;
+      atr.decl_line = @2.first_line;
       variables[*$2] = atr;
     }
   }
-  | entero ID '['NUM']' EOS
+  | entero ID '['NUM']' EOS {
+    if (find_var(*$2)) yyerror("Variable already declared", *$2, @$.first_line);
+    else if (find_func(*$2)) yyerror("A function exists with this name");
+    else {
+      if ($4 < 0) yyerror("Array size must be non-negative");
+    }
+  }
   ;
 
 tipo: entero | sin_tipo ;
@@ -71,7 +82,7 @@ fun_declaracion:
   ;
 params: lista_params | sin_tipo ;
 lista_params: lista_params ',' param | param ;
-param: tipo ID | tipo ID "[]" ;
+param: tipo ID | tipo ID '[' ']' ;
 
 sent_compuesta: '{'declaracion_local lista_sentencias'}' ;
 declaracion_local: declaracion_local var_declaracion | /* empty */ ;
@@ -103,10 +114,18 @@ expresion_simple: expresion_aditiva relop expresion_aditiva | expresion_aditiva 
 relop: '<' | "<=" | '>' | ">=" | "==" | "!=" ;
 
 expresion_aditiva: expresion_aditiva addop term | term ;
-addop: "+" | "−" ;
-term: term mulop factor | factor ;
+addop: "+" | "-" ;
+
+term: 
+  term mulop factor {
+    printf("hola");
+  }
+  | factor
+  ;
+
 mulop: "*" | "/" ;
 factor: '('expresion')' | var | call | NUM ;
+
 call: ID '('args')' {
   if (!find_func(*$1)) yyerror("Undeclared function");
 }
@@ -121,8 +140,15 @@ int yyerror(string s)
   extern int yylineno;	// defined and maintained in lex.c
   extern char *yytext;	// defined and maintained in lex.c
 
-  cerr << "ERROR: " << s << " at symbol \"" << yytext; // TODO fix yytext to before
+  cerr << "ERROR: " << s << " at symbol \"" << yytext;
   cerr << "\" on line " << yylineno << endl;
+  exit(1);
+}
+
+int yyerror(string msg, string id, int line)
+{
+  cerr << "ERROR: " << msg << " at symbol \"" << id;
+  cerr << "\" on line " << line << endl;
   exit(1);
 }
 

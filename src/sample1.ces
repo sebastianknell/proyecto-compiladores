@@ -2,4 +2,7 @@ entero x;
 entero y;
 /* comentario 
 otro aaa*/
-x = a;
+
+mientras (x != 3) {
+
+};
