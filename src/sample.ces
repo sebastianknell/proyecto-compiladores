@@ -1,9 +1,16 @@
 /* Factorial en CEs */
 
+entero a;
+
+entero fa (entero x, entero y) {
+    retorno 1;
+}
+
 sin_tipo main() {
     entero x;
-    x = leer(); /* leer un entero */
     entero fact;
+    fact = fa();
+    x = entrada(); /* leer un entero */
     fact = 1;
     si (x < 0) retorno;
     fact = fact * x;

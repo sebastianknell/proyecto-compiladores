@@ -1,2 +1,9 @@
-lex.yy.cc
-main
+*.o
+lex.c
+lex.yy.c
+bison.c
+tok.h
+ces.tab.c
+ces.tab.h
+ces.output
+ces
