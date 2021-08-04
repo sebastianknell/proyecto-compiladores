@@ -55,7 +55,7 @@ bool find_func(string id);
 
 programa: lista_declaracion declaracion_main;
 lista_declaracion: lista_declaracion declaracion | declaracion ;
-declaracion: var_declaracion | fun_declaracion | lista_sentencias  /* TODO: REMOVE. TEST ONLY */;
+declaracion: var_declaracion | fun_declaracion ;
 
 declaracion_main: 
   tipo main '(' ')' sent_compuesta {
@@ -70,9 +70,10 @@ declaracion_main:
   ;
 
 var_declaracion:
-  entero ID EOS {
+  tipo ID EOS {
     if (find_var(*$2)) yyerror("Variable already declared", *$2, @$.first_line);
     else if (find_func(*$2)) yyerror("A function exists with this name");
+    else if ($1 != 0) yyerror("Variable must be of type entero");
     else {
       var_atr atr;
       atr.type = 0;
@@ -80,9 +81,10 @@ var_declaracion:
       variables[*$2] = atr;
     }
   }
-  | entero ID '['NUM']' EOS {
+  | tipo ID '['NUM']' EOS {
     if (find_var(*$2)) yyerror("Variable already declared", *$2, @$.first_line);
     else if (find_func(*$2)) yyerror("A function exists with this name");
+    else if ($1 != 0) yyerror("Variable must be of type entero");
     else {
       if ($4 < 0) yyerror("Array size must be non-negative");
     }
