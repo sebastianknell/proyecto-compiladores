@@ -2,7 +2,7 @@
 
 entero a;
 
-entero fa () {
+entero fa (entero x, entero y) {
     retorno 1;
 }
 

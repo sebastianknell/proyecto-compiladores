@@ -137,11 +137,10 @@ sentencia_seleccion: si '('expresion')' sentencia | si '('expresion')' sentencia
 sentencia_iteracion: mientras '('expresion')' '{'lista_sentencias'}' ;
 sentencia_retorno: retorno EOS | retorno expresion EOS ;
 
-expresion: var'='expresion 
-| var'=' ID '(' ')' {
-  if (!find_func(*$3))  yyerror("Undeclared function",*$3,@$.first_line);
-} 
-| expresion_simple | var ;
+expresion: 
+  var'='expresion
+  | expresion_simple 
+  ;
 
 var: 
   ID {
@@ -160,7 +159,7 @@ addop: '+' | '-' ;
 
 term: 
   term mulop factor {
-    printf("hola");
+
   }
   | factor
   ;
