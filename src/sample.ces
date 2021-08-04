@@ -9,6 +9,7 @@ entero fa () {
 sin_tipo main() {
     entero x;
     entero fact;
+    fact = fa();
     x = entrada(); /* leer un entero */
     fact = 1;
     si (x < 0) retorno;

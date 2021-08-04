@@ -51,6 +51,7 @@ bool find_func(string id);
 %left '*' '/'
 
 %type<int_val> tipo
+%type<int_val> params lista_params param args lista_arg
 
 %%
 
@@ -103,15 +104,25 @@ fun_declaracion:
     else {
       func_atr atr;
       atr.rtype = $1;
+      atr.n_params = $4;
       atr.decl_line = @2.first_line;
       functions[*$2] = atr; 
     }
   }
   ;
 
-params: lista_params | /* empty */ ;
-lista_params: lista_params ',' param | param ;
-param: tipo ID | tipo ID '[' ']' ;
+params: 
+  lista_params { $$ = $1; }
+  | /* empty */ { $$ = 0; }
+  ;
+lista_params: 
+  lista_params ',' param { $$ = $1 + $3; }
+  | param { $$ = $1; }
+  ;
+param: 
+  tipo ID { $$ = 1; }
+  | tipo ID '[' ']' { $$ = 1; }
+  ;
 
 sent_compuesta: '{'declaracion_local lista_sentencias'}' ;
 declaracion_local: declaracion_local var_declaracion | /* empty */ ;
@@ -160,12 +171,19 @@ factor: '('expresion')' | var | call | NUM ;
 call: 
   ID '('args')' {
     if (!find_func(*$1)) yyerror("Undeclared function");
+    if (functions[*$1].n_params != $3) yyerror("Invalid number of arguments");
   }
   | entrada '('')'
   | salida '(' expresion ')'
-;
-args: lista_arg | /* empty */ ;
-lista_arg: lista_arg ',' expresion | expresion ;
+  ;
+args: 
+  lista_arg { $$ = $1; }
+  | /* empty */ { $$ = 0; }
+  ;
+lista_arg: 
+  lista_arg ',' expresion { $$ = $1 + 1; }
+  | expresion  { $$ = 1; }
+  ;
 
 %%
 

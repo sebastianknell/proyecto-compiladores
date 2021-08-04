@@ -2,5 +2,3 @@ entero x;
 entero y;
 /* comentario 
 otro aaa*/
-
-x = 2 / 24;
