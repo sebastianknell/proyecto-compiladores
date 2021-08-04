@@ -2,6 +2,10 @@
 
 entero a;
 
+entero f() {
+    retorno 1;
+}
+
 sin_tipo main() {
     entero x;
     /* x = entrada(); */ /* leer un entero */

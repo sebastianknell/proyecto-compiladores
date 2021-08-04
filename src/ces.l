@@ -28,9 +28,9 @@ num             [0-9]+
 
 \n          {yylineno++;}
 
-"entero"    { return entero; }
+"entero"    { yylval.int_val = 0; return entero; }
+"sin_tipo"  { yylval.int_val = 1; return sin_tipo; }
 "retorno"   { return retorno; }
-"sin_tipo"  { return sin_tipo; }
 "mientras"  { return mientras; }
 "si"        { return si; }
 "sino"      { return sino; }

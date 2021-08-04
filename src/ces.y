@@ -5,19 +5,14 @@ int yyerror(char *s);
 int yyerror(string msg, string id, int line);
 extern "C" int yylex();
 
-enum type_t{
-  sin_tipo_t,
-  entero_t
-};
-
 struct var_atr {
-  type_t type;
+  int type;
   int value;
   int decl_line;
 };
 
 struct func_atr {
-  type_t rtype;
+  int rtype;
   int n_params;
   int decl_line;
 };
@@ -37,11 +32,13 @@ bool find_func(string id);
 
 %start programa
 
-%token entero sin_tipo
+%token<int_val> entero sin_tipo
 %token retorno mientras si sino
 %token main
 
-%token ID NUM EOS
+%token<str_val> ID 
+%token<int_val> NUM 
+%token EOS
 %token RELOP_GT
 %token RELOP_LT
 %token RELOP_GEQ
@@ -52,9 +49,7 @@ bool find_func(string id);
 %left '+' '-'
 %left '*' '/'
 
-%type<str_val> ID
-%type<int_val> NUM
-//%type<str_val> tipo
+%type<int_val> tipo
 
 %%
 
@@ -63,24 +58,15 @@ lista_declaracion: lista_declaracion declaracion | declaracion ;
 declaracion: var_declaracion | fun_declaracion | lista_sentencias  /* TODO: REMOVE. TEST ONLY */;
 
 declaracion_main: 
-  sin_tipo main '(' ')' sent_compuesta {
+  tipo main '(' ')' sent_compuesta {
     if (find_func("main")) yyerror("Main function already declared");
     else{
       func_atr atr;
-      atr.rtype = sin_tipo_t;
+      atr.rtype = $1;
       atr.decl_line = @2.first_line;
       functions["main"] = atr;
     }
   } 
-  | entero main '(' ')' sent_compuesta {
-     if (find_func("main")) yyerror("Main function already declared");
-     else{
-      func_atr atr;
-      atr.rtype = entero_t;
-      atr.decl_line = @2.first_line;
-      functions["main"] = atr;
-    }
-  }
   ;
 
 var_declaracion:
@@ -89,7 +75,7 @@ var_declaracion:
     else if (find_func(*$2)) yyerror("A function exists with this name");
     else {
       var_atr atr;
-      atr.type = entero_t;
+      atr.type = 0;
       atr.decl_line = @2.first_line;
       variables[*$2] = atr;
     }
@@ -103,20 +89,25 @@ var_declaracion:
   }
   ;
 
-tipo: entero | sin_tipo ;
+tipo: 
+  entero { $$ = $1; }
+  | sin_tipo { $$ = $1; }
+  ;
 
 fun_declaracion: 
   tipo ID '(' params ')' sent_compuesta {
     if (find_func(*$2)) yyerror("Function already declared");
     else {
       func_atr atr;
-      atr.rtype = entero_t;
+      printf("%d",$1);
+      atr.rtype = $1;
       atr.decl_line = @2.first_line;
       functions[*$2] = atr; 
     }
-  } 
+  }
   ;
-params: lista_params | sin_tipo ;
+
+params: lista_params | /* empty */ ;
 lista_params: lista_params ',' param | param ;
 param: tipo ID | tipo ID '[' ']' ;
 
