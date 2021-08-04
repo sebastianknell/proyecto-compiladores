@@ -62,7 +62,8 @@ programa: lista_declaracion declaracion_main;
 lista_declaracion: lista_declaracion declaracion | declaracion ;
 declaracion: var_declaracion | fun_declaracion | lista_sentencias  /* TODO: REMOVE. TEST ONLY */;
 
-declaracion_main: sin_tipo main '(' ')' sent_compuesta {
+declaracion_main: 
+  sin_tipo main '(' ')' sent_compuesta {
     if (find_func("main")) yyerror("Main function already declared");
     else{
       func_atr atr;
@@ -70,7 +71,8 @@ declaracion_main: sin_tipo main '(' ')' sent_compuesta {
       atr.decl_line = @2.first_line;
       functions["main"] = atr;
     }
-  } | entero main '(' ')' sent_compuesta{
+  } 
+  | entero main '(' ')' sent_compuesta {
      if (find_func("main")) yyerror("Main function already declared");
      else{
       func_atr atr;
@@ -79,6 +81,7 @@ declaracion_main: sin_tipo main '(' ')' sent_compuesta {
       functions["main"] = atr;
     }
   }
+  ;
 
 var_declaracion:
   entero ID EOS {

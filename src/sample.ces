@@ -1,8 +1,10 @@
 /* Factorial en CEs */
 
+entero a;
+
 sin_tipo main() {
     entero x;
-    x = entrada(); /* leer un entero */
+    /* x = entrada(); */ /* leer un entero */
     entero fact;
     fact = 1;
     si (x < 0) retorno;
@@ -12,5 +14,5 @@ sin_tipo main() {
         fact = fact * x;
         x = x - 1;
     }
-    salida(fact);
+    /* salida(fact); */
 }
