@@ -49,8 +49,8 @@ bool find_func(string id);
 %token RELOP_EQ
 %token RELOP_NEQ
 
-%left "+" "-"
-%left "*" "/"
+%left '+' '-'
+%left '*' '/'
 
 %type<str_val> ID
 %type<int_val> NUM
@@ -122,7 +122,7 @@ expresion_simple: expresion_aditiva relop expresion_aditiva | expresion_aditiva 
 relop: RELOP_LT | RELOP_LEQ | RELOP_GT | RELOP_GEQ | RELOP_EQ | RELOP_NEQ ;
 
 expresion_aditiva: expresion_aditiva addop term | term ;
-addop: "+" | "-" ;
+addop: '+' | '-' ;
 
 term: 
   term mulop factor {
@@ -131,7 +131,7 @@ term:
   | factor
   ;
 
-mulop: "*" | "/" ;
+mulop: '*' | '/' ;
 factor: '('expresion')' | var | call | NUM ;
 
 call: ID '('args')' {

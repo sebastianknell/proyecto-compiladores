@@ -3,6 +3,4 @@ entero y;
 /* comentario 
 otro aaa*/
 
-mientras (x != 3) {
-
-};
+x = 2 / 24;
