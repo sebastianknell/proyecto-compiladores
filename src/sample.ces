@@ -8,8 +8,8 @@ entero fa () {
 
 sin_tipo main() {
     entero x;
-    /* x = entrada(); */ /* leer un entero */
     entero fact;
+    x = entrada(); /* leer un entero */
     fact = 1;
     si (x < 0) retorno;
     fact = fact * x;
@@ -18,5 +18,5 @@ sin_tipo main() {
         fact = fact * x;
         x = x - 1;
     }
-    /* salida(fact); */
+    salida(fact);
 }

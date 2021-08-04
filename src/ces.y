@@ -35,6 +35,7 @@ bool find_func(string id);
 %token<int_val> entero sin_tipo
 %token retorno mientras si sino
 %token main
+%token entrada salida
 
 %token<str_val> ID 
 %token<int_val> NUM 
@@ -101,7 +102,6 @@ fun_declaracion:
     if (find_func(*$2)) yyerror("Function already declared");
     else {
       func_atr atr;
-      printf("%d",$1);
       atr.rtype = $1;
       atr.decl_line = @2.first_line;
       functions[*$2] = atr; 
@@ -157,9 +157,12 @@ term:
 mulop: '*' | '/' ;
 factor: '('expresion')' | var | call | NUM ;
 
-call: ID '('args')' {
-  if (!find_func(*$1)) yyerror("Undeclared function");
-}
+call: 
+  ID '('args')' {
+    if (!find_func(*$1)) yyerror("Undeclared function");
+  }
+  | entrada '('')'
+  | salida '(' expresion ')'
 ;
 args: lista_arg | /* empty */ ;
 lista_arg: lista_arg ',' expresion | expresion ;

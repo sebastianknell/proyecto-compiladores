@@ -35,6 +35,8 @@ num             [0-9]+
 "si"        { return si; }
 "sino"      { return sino; }
 "main"      { return main; }
+"entrada"   { return entrada; }
+"salida"    { return salida; }
 
 {id}        { yylval.str_val = new string(yytext); return ID; }
 {num}       { yylval.int_val = stoi(yytext); return NUM; }
