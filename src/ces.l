@@ -41,12 +41,12 @@ num             [0-9]+
 
 ";"         { return EOS; }
 
-">"         { return *yytext; }
-"<"         { return *yytext; }
-">="        { return *yytext; }
-"<="        { return *yytext; }
-"=="        { return *yytext; }
-"!="        { return *yytext; }
+">"         { return RELOP_GT; }
+"<"         { return RELOP_LT; }
+">="        { return RELOP_GEQ; }
+"<="        { return RELOP_LEQ; }
+"=="        { return RELOP_EQ; }
+"!="        { return RELOP_NEQ; }
 
 [=,()\[\]{}+-/*] { return yytext[0]; }
 

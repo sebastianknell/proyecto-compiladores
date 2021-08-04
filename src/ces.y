@@ -39,8 +39,16 @@ bool find_func(string id);
 
 %token entero sin_tipo
 %token retorno mientras si sino
-%token ID NUM EOS
 %token main
+
+%token ID NUM EOS
+%token RELOP_GT
+%token RELOP_LT
+%token RELOP_GEQ
+%token RELOP_LEQ
+%token RELOP_EQ
+%token RELOP_NEQ
+
 %left "+" "-"
 %left "*" "/"
 
@@ -111,7 +119,7 @@ var:
   ;
 
 expresion_simple: expresion_aditiva relop expresion_aditiva | expresion_aditiva ;
-relop: '<' | "<=" | '>' | ">=" | "==" | "!=" ;
+relop: RELOP_LT | RELOP_LEQ | RELOP_GT | RELOP_GEQ | RELOP_EQ | RELOP_NEQ ;
 
 expresion_aditiva: expresion_aditiva addop term | term ;
 addop: "+" | "-" ;
