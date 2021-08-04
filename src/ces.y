@@ -54,12 +54,31 @@ bool find_func(string id);
 
 %type<str_val> ID
 %type<int_val> NUM
+//%type<str_val> tipo
 
 %%
 
-programa: lista_declaracion ;
+programa: lista_declaracion declaracion_main;
 lista_declaracion: lista_declaracion declaracion | declaracion ;
-declaracion: var_declaracion | fun_declaracion | lista_sentencias /* TODO: REMOVE. TEST ONLY */;
+declaracion: var_declaracion | fun_declaracion | lista_sentencias  /* TODO: REMOVE. TEST ONLY */;
+
+declaracion_main: sin_tipo main '(' ')' sent_compuesta {
+    if (find_func("main")) yyerror("Main function already declared");
+    else{
+      func_atr atr;
+      atr.rtype = sin_tipo_t;
+      atr.decl_line = @2.first_line;
+      functions["main"] = atr;
+    }
+  } | entero main '(' ')' sent_compuesta{
+     if (find_func("main")) yyerror("Main function already declared");
+     else{
+      func_atr atr;
+      atr.rtype = entero_t;
+      atr.decl_line = @2.first_line;
+      functions["main"] = atr;
+    }
+  }
 
 var_declaracion:
   entero ID EOS {
@@ -67,7 +86,7 @@ var_declaracion:
     else if (find_func(*$2)) yyerror("A function exists with this name");
     else {
       var_atr atr;
-      atr.type = type_t::entero_t;
+      atr.type = entero_t;
       atr.decl_line = @2.first_line;
       variables[*$2] = atr;
     }
@@ -86,7 +105,13 @@ tipo: entero | sin_tipo ;
 fun_declaracion: 
   tipo ID '(' params ')' sent_compuesta {
     if (find_func(*$2)) yyerror("Function already declared");
-  }
+    else {
+      func_atr atr;
+      atr.rtype = entero_t;
+      atr.decl_line = @2.first_line;
+      functions[*$2] = atr; 
+    }
+  } 
   ;
 params: lista_params | sin_tipo ;
 lista_params: lista_params ',' param | param ;
@@ -105,10 +130,12 @@ sentencia_seleccion: si '('expresion')' sentencia | si '('expresion')' sentencia
 sentencia_iteracion: mientras '('expresion')' '{'lista_sentencias'}' ;
 sentencia_retorno: retorno EOS | retorno expresion EOS ;
 
-expresion: 
-  var'='expresion
-  | expresion_simple 
-  ;
+expresion: var'='expresion 
+| var'=' ID '(' ')' {
+  if (!find_func(*$3))  yyerror("Undeclared function",*$3,@$.first_line);
+} 
+| expresion_simple | var ;
+
 var: 
   ID {
     if (!find_var(*$1)) yyerror("Undeclared variable");
